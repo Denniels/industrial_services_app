@@ -6,13 +6,30 @@ from sqlalchemy.pool import QueuePool
 from dotenv import load_dotenv
 import os
 import logging
+import sys
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Cargar variables de entorno
-load_dotenv()
+load_dotenv(encoding='utf-8')
+
+# Configuración forzada de encoding para Windows
+if sys.platform.startswith('win'):
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer)
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+
+# Configuración de la base de datos
+DATABASE_CONFIG = {
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'database': os.getenv('DB_NAME', 'integral_service_db'),
+    'user': os.getenv('DB_USER', 'postgres'),
+    'password': os.getenv('DB_PASSWORD', 'DAms15820'),
+    'port': os.getenv('DB_PORT', '5432'),
+    'options': '-c client_encoding=utf8'
+}
 
 # Configuración de la base de datos
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:admin@localhost:5432/integral_service_db')

@@ -1,84 +1,61 @@
 # -*- coding: utf-8 -*-
-import os
 import streamlit as st
-from auth.login import login_page
-from database.config import engine
-from database.models import Base
-import config
-from dotenv import load_dotenv
+import sys
+import os
 
-# Asegurar que las variables de entorno estén cargadas
-load_dotenv()
-
-# Inicializar la base de datos
-try:
-    Base.metadata.create_all(bind=engine)
-except Exception as e:
-    st.error(f"Error al inicializar la base de datos: {str(e)}")
-    st.stop()
+# Configuración de codificación para Windows
+if sys.platform.startswith('win'):
+    import locale
+    try:
+        locale.setlocale(locale.LC_ALL, 'es-ES.UTF-8')
+    except locale.Error:
+        try:
+            locale.setlocale(locale.LC_ALL, 'Spanish_Spain.1252')
+        except locale.Error:
+            locale.setlocale(locale.LC_ALL, '')
+    
+    # Forzar UTF-8 en Windows
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    if sys.stdout.encoding != 'utf-8':
+        import codecs
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, errors='replace')
 
 # Configuración de la página
-try:
-    st.set_page_config(
-        page_title=config.APP_NAME,
-        page_icon="🔧",
-        layout="wide",
-        initial_sidebar_state="expanded"
-    )
-except Exception as e:
-    st.error(f"Error en la configuración de la página: {str(e)}")
-    st.stop()
+st.set_page_config(
+    page_title="Sistema de Gestión - Integral Service",
+    page_icon="🔧",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Importaciones del proyecto
+from auth.login import login_page
+from database.models import init_database
+from pages.admin.dashboard import admin_dashboard
+from pages.technician.dashboard import technician_dashboard
+from pages.client.service_request import client_dashboard
 
 def main():
-    # Verificar autenticación
-    if "user" not in st.session_state or st.session_state.user is None:
-        login_page()
-        return
+    try:
+        # Inicializar la base de datos
+        init_database()
+        
+        # Resto del código de la aplicación
+        if 'logged_in' not in st.session_state:
+            st.session_state.logged_in = False
 
-    # Sidebar con navegación
-    st.sidebar.title("Menú Principal")
-    user_role = st.session_state.user["role"]
+        if not st.session_state.logged_in:
+            login_page()
+        else:
+            if st.session_state.user_role == 'admin':
+                admin_dashboard()
+            elif st.session_state.user_role == 'technician':
+                technician_dashboard()
+            else:
+                client_dashboard()
 
-    if user_role == "admin":
-        page = st.sidebar.selectbox(
-            "Seleccione una página",
-            ["Dashboard", "Clientes", "Servicios", "Técnicos", "Facturación"]
-        )
-    elif user_role == "technician":
-        page = st.sidebar.selectbox(
-            "Seleccione una página",
-            ["Mis Servicios", "Informes Técnicos", "Mi Calendario"]
-        )
-    else:  # cliente
-        page = st.sidebar.selectbox(
-            "Seleccione una página",
-            ["Solicitar Servicio", "Mis Servicios", "Facturas"]
-        )
+    except Exception as e:
+        st.error(f"Error al inicializar la base de datos: {str(e)}")
 
-    # Mostrar la página seleccionada
-    st.title(page)
-    
-    # Aquí irá la lógica de enrutamiento a las diferentes páginas
-    if page == "Dashboard":
-        show_dashboard()
-    elif page == "Clientes":
-        show_clients()
-    # ... (más páginas se agregarán después)
-
-def show_dashboard():
-    st.header("Dashboard")
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.metric(label="Servicios Pendientes", value="10")
-    with col2:
-        st.metric(label="Servicios en Proceso", value="5")
-    with col3:
-        st.metric(label="Servicios Completados", value="15")
-
-def show_clients():
-    st.header("Gestión de Clientes")
-    # Aquí irá la lógica de gestión de clientes
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

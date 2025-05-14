@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, Float, Text, Enum, Boolean, JSON, ARRAY
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, sessionmaker
 from datetime import datetime
 import enum
+import os
+from .config import DATABASE_CONFIG
 
 Base = declarative_base()
 
@@ -65,6 +67,8 @@ class User(Base):
     updated_at = Column(DateTime, onupdate=datetime.utcnow)
     
     company = relationship('Company')
+    service_requests = relationship('ServiceRequest', foreign_keys='ServiceRequest.client_id', back_populates='client')
+    assigned_services = relationship('ServiceRequest', foreign_keys='ServiceRequest.assigned_technician_id', back_populates='technician')
 
 class Technician(Base):
     __tablename__ = 'technicians'
@@ -146,26 +150,22 @@ class ServiceRequest(Base):
     __tablename__ = 'service_requests'
     
     id = Column(Integer, primary_key=True)
-    client_id = Column(Integer, ForeignKey('clients.id'))
-    equipment_id = Column(Integer, ForeignKey('equipment.id'))
+    client_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     service_type = Column(Enum(ServiceType), nullable=False)
-    is_contract_service = Column(Boolean, default=False)
-    priority = Column(String(20))
-    description = Column(Text)
-    status = Column(Enum(ServiceStatus), default=ServiceStatus.PENDING)
-    requested_date = Column(DateTime, nullable=False)
+    description = Column(Text, nullable=False)
+    urgency_level = Column(Integer, nullable=False)
+    status = Column(Enum(ServiceStatus), nullable=False, default=ServiceStatus.PENDING)
+    preferred_date = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, onupdate=datetime.utcnow)
+    assigned_technician_id = Column(Integer, ForeignKey('users.id'))
     scheduled_date = Column(DateTime)
     completion_date = Column(DateTime)
-    technician_id = Column(Integer, ForeignKey('technicians.id'))
-    supervisor_id = Column(Integer, ForeignKey('users.id'))
-    estimated_hours = Column(Float)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    notes = Column(Text)
     
-    client = relationship('Client')
-    equipment = relationship('Equipment')
-    technician = relationship('Technician')
-    supervisor = relationship('User', foreign_keys=[supervisor_id])
-    technical_report = relationship('TechnicalReport', back_populates='service_request')
+    # Relaciones
+    client = relationship('User', foreign_keys=[client_id], back_populates='service_requests')
+    technician = relationship('User', foreign_keys=[assigned_technician_id], back_populates='assigned_services')
 
 class TechnicalReport(Base):
     __tablename__ = 'technical_reports'
@@ -351,3 +351,27 @@ class Budget(Base):
     service_request = relationship('ServiceRequest')
     client = relationship('Client')
     pricing = relationship('ServicePricing')
+
+def init_database():
+    """Inicializa la conexión a la base de datos y crea las tablas si no existen"""
+    try:
+        # Crear URL de conexión
+        db_url = f"postgresql://{DATABASE_CONFIG['user']}:{DATABASE_CONFIG['password']}@{DATABASE_CONFIG['host']}:{DATABASE_CONFIG['port']}/{DATABASE_CONFIG['database']}"
+        
+        # Crear el motor de la base de datos con la configuración UTF-8
+        engine = create_engine(
+            db_url,
+            echo=False,
+            connect_args={'options': '-c client_encoding=utf8'}
+        )
+        
+        # Crear todas las tablas definidas
+        Base.metadata.create_all(engine)
+        
+        # Crear y devolver la sesión
+        Session = sessionmaker(bind=engine)
+        return Session()
+        
+    except Exception as e:
+        print(f"Error al inicializar la base de datos: {str(e)}")
+        raise

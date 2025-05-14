@@ -10,8 +10,17 @@ from dotenv import load_dotenv
 # Asegurar que Python use UTF-8 por defecto
 if sys.platform.startswith('win'):
     import locale
-    locale.setlocale(locale.LC_ALL, 'esp_esp.UTF-8')
+    try:
+        locale.setlocale(locale.LC_ALL, 'es-ES.UTF-8')
+    except locale.Error:
+        try:
+            locale.setlocale(locale.LC_ALL, 'Spanish_Spain.1252')
+        except locale.Error:
+            locale.setlocale(locale.LC_ALL, '')
     
+    # Forzar UTF-8 en Windows
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+
 # Cargar variables de entorno
 load_dotenv(encoding='utf-8')
 
