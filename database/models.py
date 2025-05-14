@@ -5,7 +5,14 @@ from sqlalchemy.orm import relationship, sessionmaker
 from datetime import datetime
 import enum
 import os
-from .config import DATABASE_CONFIG
+
+DATABASE_CONFIG = {
+    'host': 'localhost',
+    'database': 'integral_service_db',
+    'user': 'postgres',
+    'password': 'DAms15820',
+    'port': '5432'
+}
 
 Base = declarative_base()
 
@@ -18,7 +25,7 @@ class UserRole(enum.Enum):
 class ServiceType(enum.Enum):
     AUTOMATION = "Automatización"
     REFRIGERATION = "Refrigeración"
-    ELECTROMECHANICAL = "Electromecánica Industrial"
+    ELECTROMECHANICAL = "Electromecánica"
     PNEUMATIC = "Neumática"
     HYDRAULIC = "Hidráulica"
 
@@ -31,9 +38,15 @@ class ServiceStatus(enum.Enum):
 
 class ContractType(enum.Enum):
     NONE = "Sin Contrato"
+    MONITORING = "Contrato de Monitoreo"
     BASIC = "Contrato Básico"
     PREMIUM = "Contrato Premium"
     CUSTOM = "Contrato Personalizado"
+
+class PLCBrand(enum.Enum):
+    SIEMENS = "Siemens"
+    SCHNEIDER = "Schneider Electric"
+    DELTA = "Delta"
 
 class Company(Base):
     __tablename__ = 'companies'
@@ -49,26 +62,31 @@ class Company(Base):
     is_internal = Column(Boolean, default=False)  # True para Integral Service SPA
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, onupdate=datetime.utcnow)
+    
+    employees = relationship('User', back_populates='company')
 
 class User(Base):
     __tablename__ = 'users'
     
     id = Column(Integer, primary_key=True)
-    company_id = Column(Integer, ForeignKey('companies.id'))
     username = Column(String(50), unique=True, nullable=False)
     email = Column(String(100), unique=True, nullable=False)
-    password_hash = Column(String(100), nullable=False)
+    password = Column(String(255), nullable=False)
     role = Column(Enum(UserRole), nullable=False)
     first_name = Column(String(50))
     last_name = Column(String(50))
-    phone = Column(String(20))
     is_active = Column(Boolean, default=True)
+    first_login = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, onupdate=datetime.utcnow)
+    password_change_required = Column(Boolean, default=False)  # Para forzar cambio de contraseña
+    company_id = Column(Integer, ForeignKey('companies.id'))
     
-    company = relationship('Company')
-    service_requests = relationship('ServiceRequest', foreign_keys='ServiceRequest.client_id', back_populates='client')
-    assigned_services = relationship('ServiceRequest', foreign_keys='ServiceRequest.assigned_technician_id', back_populates='technician')
+    # Relaciones
+    company = relationship('Company', back_populates='employees')
+    client_requests = relationship('ServiceRequest', back_populates='client', foreign_keys='ServiceRequest.client_id')
+    assigned_services = relationship('ServiceRequest', back_populates='technician', foreign_keys='ServiceRequest.assigned_technician_id')
+    monitoring_devices = relationship('MonitoringDevice', back_populates='client')
 
 class Technician(Base):
     __tablename__ = 'technicians'
@@ -164,7 +182,7 @@ class ServiceRequest(Base):
     notes = Column(Text)
     
     # Relaciones
-    client = relationship('User', foreign_keys=[client_id], back_populates='service_requests')
+    client = relationship('User', foreign_keys=[client_id], back_populates='client_requests')
     technician = relationship('User', foreign_keys=[assigned_technician_id], back_populates='assigned_services')
 
 class TechnicalReport(Base):
@@ -352,18 +370,47 @@ class Budget(Base):
     client = relationship('Client')
     pricing = relationship('ServicePricing')
 
+class MonitoringDevice(Base):
+    __tablename__ = 'monitoring_devices'
+    
+    id = Column(Integer, primary_key=True)
+    client_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    device_serial = Column(String(50), unique=True, nullable=False)
+    variables_count = Column(Integer, default=0)
+    max_variables = Column(Integer, default=10)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, onupdate=datetime.utcnow)
+    
+    # Relaciones
+    client = relationship('User', back_populates='monitoring_devices')
+    variables = relationship('MonitoredVariable', back_populates='device')
+
+class MonitoredVariable(Base):
+    __tablename__ = 'monitored_variables'
+    
+    id = Column(Integer, primary_key=True)
+    device_id = Column(Integer, ForeignKey('monitoring_devices.id'), nullable=False)
+    name = Column(String(50), nullable=False)
+    description = Column(String(200))
+    unit = Column(String(20))
+    min_value = Column(Float)
+    max_value = Column(Float)
+    alert_enabled = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, onupdate=datetime.utcnow)
+    
+    # Relaciones
+    device = relationship('MonitoringDevice', back_populates='variables')
+
 def init_database():
     """Inicializa la conexión a la base de datos y crea las tablas si no existen"""
     try:
         # Crear URL de conexión
         db_url = f"postgresql://{DATABASE_CONFIG['user']}:{DATABASE_CONFIG['password']}@{DATABASE_CONFIG['host']}:{DATABASE_CONFIG['port']}/{DATABASE_CONFIG['database']}"
         
-        # Crear el motor de la base de datos con la configuración UTF-8
-        engine = create_engine(
-            db_url,
-            echo=False,
-            connect_args={'options': '-c client_encoding=utf8'}
-        )
+        # Crear el motor de la base de datos
+        engine = create_engine(db_url, echo=False)
         
         # Crear todas las tablas definidas
         Base.metadata.create_all(engine)

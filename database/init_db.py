@@ -14,25 +14,39 @@ def create_database():
     try:
         # Conectar a postgres
         conn = psycopg2.connect(
-            dbname='postgres',
-            user='postgres',
-            password='admin',
+            dbname='postgres',  # Primero nos conectamos a la base postgres
+            user='postgres',    # Usuario por defecto de PostgreSQL
+            password='DAms15820',
             host='localhost',
             port='5432'
         )
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         
-        # Verificar si la base de datos existe
+        # Eliminar conexiones existentes a la base de datos
         cur = conn.cursor()
-        cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (db_name,))
-        exists = cur.fetchone()
+        cur.execute(f"""
+            SELECT pg_terminate_backend(pg_stat_activity.pid)
+            FROM pg_stat_activity
+            WHERE pg_stat_activity.datname = '{db_name}'
+            AND pid <> pg_backend_pid()
+        """)
         
-        if not exists:
-            # Crear base de datos
-            cur.execute(f"CREATE DATABASE {db_name}")
-            logger.info(f"✅ Base de datos {db_name} creada exitosamente")
-        else:
-            logger.info(f"Base de datos {db_name} ya existe")
+        # Eliminar la base de datos si existe
+        cur.execute(f"DROP DATABASE IF EXISTS {db_name}")
+        logger.info(f"Base de datos {db_name} eliminada (si existía)")
+        
+        # Crear base de datos nueva
+        cur.execute(f"""
+            CREATE DATABASE {db_name}
+            WITH 
+                OWNER = postgres
+                ENCODING = 'UTF8'
+                LC_COLLATE = 'Spanish_Spain.1252'
+                LC_CTYPE = 'Spanish_Spain.1252'
+                TEMPLATE = template0
+                CONNECTION LIMIT = -1;
+        """)
+        logger.info(f"✅ Base de datos {db_name} creada exitosamente")
             
     except Exception as e:
         logger.error(f"❌ Error al crear la base de datos: {str(e)}")

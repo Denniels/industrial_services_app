@@ -29,6 +29,51 @@ APP_NAME = "Sistema de Gestión - Integral Service SPA"
 COMPANY_NAME = os.getenv('COMPANY_NAME', 'Integral Service SPA')
 ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
 
+# Información de la empresa
+COMPANY_NAME = "Integral Service SPA"
+COMPANY_PHONE = "+56 9 6366 9300"
+COMPANY_EMAIL = "contacto@integralservicespa.cl"
+COMPANY_WEBSITE = "http://integralservicespa.cl"
+
+# Configuración de horarios
+BUSINESS_HOURS = {
+    'weekdays': {'start': '8:30', 'end': '18:00'},
+    'saturday': {'start': '9:00', 'end': '13:00'},
+}
+
+# Configuración de servicios de emergencia
+EMERGENCY_SERVICE = {
+    'phone': "+56 9 6366 9300",
+    'requires_contract': True,
+    'response_time': {
+        'critical': 1,  # horas
+        'high': 4,
+        'medium': 12,
+        'low': 24
+    }
+}
+
+# Configuración de contratos
+CONTRACT_SETTINGS = {
+    'monitoring': {
+        'max_variables': 10,
+        'price_per_device_uf': 2.5,
+        'includes_24_7': True,
+        'priority_level': 'high'
+    },
+    'basic': {
+        'maintenance_frequency': 3,  # meses
+        'discount_percentage': 10,
+        'priority_level': 'normal'
+    },
+    'premium': {
+        'maintenance_frequency': 1,  # mes
+        'discount_percentage': 20,
+        'includes_24_7': True,
+        'priority_level': 'high'
+    }
+}
+
 # Configuración de la base de datos
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:admin@localhost:5432/integral_service_db')
 

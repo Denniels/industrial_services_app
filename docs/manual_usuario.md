@@ -1,224 +1,161 @@
-# Manual de Usuario - Integral Service SPA
+# Manual de Usuario - Sistema de Gestión Integral Service
 
-## 📱 Interfaz de Usuario
+## Índice
+1. [Introducción](#introducción)
+2. [Acceso al Sistema](#acceso-al-sistema)
+3. [Roles de Usuario](#roles-de-usuario)
+4. [Funcionalidades por Rol](#funcionalidades-por-rol)
+5. [Operaciones Comunes](#operaciones-comunes)
+6. [Solución de Problemas](#solución-de-problemas)
 
-### 1. Inicio de Sesión
-- Acceder a la aplicación mediante navegador web
-- Ingresar credenciales (usuario y contraseña)
-- Seleccionar "Iniciar Sesión"
+## Introducción
 
-### 2. Panel de Control
+El Sistema de Gestión de Integral Service es una plataforma web diseñada para administrar servicios industriales de manera eficiente. Este manual proporciona una guía detallada para el uso de todas las funcionalidades del sistema.
 
-#### 2.1 Administrador
-- **Dashboard Principal**
-  - Métricas clave
-  - Gráficos de rendimiento
-  - Estado de servicios
-  - Resumen financiero
+## Acceso al Sistema
 
-- **Gestión de Usuarios**
-  - Crear nuevos usuarios
-  - Asignar roles
-  - Modificar permisos
-  - Desactivar usuarios
+### Primer Acceso
+1. Abrir el navegador web y acceder a la URL proporcionada
+2. Ingresar con las credenciales iniciales:
+   - Usuario: [proporcionado por el administrador]
+   - Contraseña: [proporcionada por el administrador]
+3. Por seguridad, se solicitará cambiar la contraseña en el primer inicio de sesión
 
-- **Gestión de Clientes**
-  - Registro de empresas
-  - Gestión de contratos
-  - Historial de servicios
-  - Configuración de precios
+### Cambio de Contraseña
+- La nueva contraseña debe cumplir con:
+  - Mínimo 8 caracteres
+  - Al menos una letra mayúscula
+  - Al menos un número
+  - Al menos un carácter especial
 
-- **Gestión de Servicios**
-  - Asignación de técnicos
-  - Seguimiento de servicios
-  - Aprobación de informes
-  - Programación de mantenimientos
+## Roles de Usuario
 
-#### 2.2 Técnico
-- **Mis Servicios**
-  - Ver servicios asignados
-  - Actualizar estado
-  - Registrar trabajo realizado
-  - Subir evidencias
+### 1. Administrador
+- Gestión completa del sistema
+- Creación y administración de usuarios
+- Acceso a todos los módulos y reportes
+- Configuración del sistema
 
-- **Informes Técnicos**
-  - Crear nuevos informes
-  - Adjuntar fotos
-  - Registrar materiales
-  - Firmar digitalmente
+### 2. Técnico
+- Gestión de órdenes de servicio asignadas
+- Actualización de estado de servicios
+- Registro de actividades y materiales
+- Generación de informes técnicos
 
-- **Calendario**
-  - Ver programación
-  - Gestionar disponibilidad
-  - Confirmar servicios
+### 3. Cliente
+- Solicitud de nuevos servicios
+- Seguimiento de servicios activos
+- Acceso a historial de servicios
+- Descarga de informes y facturas
 
-#### 2.2 Técnicos
-- **Panel de Servicios**
-  - Lista de servicios asignados
-  - Estado de cada servicio
-  - Prioridades y fechas límite
+### 4. Supervisor
+- Supervisión de técnicos
+- Asignación de servicios
+- Revisión de informes
+- Control de calidad
 
-- **Gestión de Servicios**
-  - Ver detalles del servicio
-  - Actualizar estado
-  - Subir fotos y documentos
-  - Registrar materiales utilizados
+## Funcionalidades por Rol
 
-- **Reportes Técnicos**
-  - Crear nuevo reporte
-  - Documentar diagnóstico
-  - Registrar trabajo realizado
-  - Adjuntar evidencias
+### Panel de Administrador
+1. **Gestión de Usuarios**
+   - Crear nuevos usuarios
+   - Modificar permisos
+   - Desactivar cuentas
+   - Restablecer contraseñas
 
-#### 2.3 Cliente
-- **Solicitudes**
-  - Crear nueva solicitud
-  - Ver estado
-  - Cancelar solicitud
-  - Programar mantenimiento
+2. **Gestión de Servicios**
+   - Crear tipos de servicio
+   - Definir tarifas
+   - Configurar parámetros
 
-- **Mis Equipos**
-  - Ver listado
-  - Historial de servicios
-  - Estado actual
-  - Próximos mantenimientos
+3. **Reportes y Estadísticas**
+   - Rendimiento de técnicos
+   - Estado de servicios
+   - Satisfacción de clientes
+   - Indicadores financieros
 
-#### 2.3 Clientes
-- **Solicitudes de Servicio**
-  - Crear nueva solicitud
-  - Ver estado de solicitudes
-  - Histórico de servicios
+### Panel de Técnico
+1. **Gestión de Órdenes**
+   - Ver órdenes asignadas
+   - Actualizar estado
+   - Registrar materiales
+   - Subir fotos y documentos
 
-- **Gestión de Equipos**
-  - Inventario de equipos
-  - Historial de mantenimiento
-  - Programar mantenimientos
+2. **Registro de Actividades**
+   - Tiempo trabajado
+   - Materiales utilizados
+   - Observaciones
+   - Firma del cliente
 
-### 3. Funciones Principales
+### Panel de Cliente
+1. **Solicitudes de Servicio**
+   - Crear nueva solicitud
+   - Seleccionar tipo de servicio
+   - Adjuntar documentos
+   - Especificar urgencia
 
-#### 3.1 Crear Solicitud de Servicio
-1. Seleccionar "Nueva Solicitud"
-2. Elegir tipo de servicio
-3. Seleccionar equipo
-4. Describir problema
-5. Elegir fecha preferida
-6. Confirmar solicitud
+2. **Seguimiento**
+   - Estado actual
+   - Histórico de servicios
+   - Comunicación con técnicos
+   - Evaluación del servicio
 
-#### 3.2 Generar Informe Técnico
-1. Acceder a servicio asignado
-2. Completar diagnóstico
-3. Registrar trabajo realizado
-4. Agregar materiales utilizados
-5. Adjuntar fotos
-6. Obtener firma del cliente
-7. Enviar informe
+## Operaciones Comunes
 
-#### 3.3 Aprobar Presupuesto
-1. Revisar detalles
-2. Verificar costos
-3. Aceptar/Rechazar
-4. Firmar digitalmente
-
-## 🛠️ Funcionalidades Principales
-
-### 1. Gestión de Servicios
-
-#### Crear Solicitud de Servicio
-1. Ir a "Nueva Solicitud"
-2. Seleccionar tipo de servicio
-3. Elegir equipo afectado
-4. Describir el problema
-5. Adjuntar fotos (opcional)
-6. Enviar solicitud
-
-#### Seguimiento de Servicios
-1. Acceder a "Mis Servicios"
-2. Filtrar por estado/fecha
-3. Ver detalles del servicio
-4. Descargar reportes
-
-### 2. Gestión de Equipos
-
-#### Registro de Equipos
-1. Ir a "Equipos"
-2. Click en "Nuevo Equipo"
-3. Completar información:
-   - Datos generales
-   - Especificaciones técnicas
-   - Documentación
-4. Guardar equipo
-
-#### Mantenimiento Preventivo
-1. Seleccionar equipo
-2. Ir a "Programar Mantenimiento"
-3. Definir:
-   - Frecuencia
+### Crear una Solicitud de Servicio
+1. Acceder al panel de cliente
+2. Hacer clic en "Nueva Solicitud"
+3. Completar el formulario:
    - Tipo de servicio
-   - Requisitos especiales
+   - Descripción del problema
+   - Nivel de urgencia
+   - Fecha preferida
+4. Adjuntar documentos relevantes
+5. Enviar solicitud
 
-### 3. Reportes y Documentación
+### Actualizar Estado de Servicio (Técnicos)
+1. Acceder al panel de técnico
+2. Seleccionar la orden de trabajo
+3. Actualizar estado:
+   - En proceso
+   - Pausado
+   - Completado
+4. Agregar comentarios y fotos
+5. Guardar cambios
 
-#### Generar Reportes
-1. Acceder a "Reportes"
-2. Seleccionar tipo:
-   - Servicio técnico
-   - Mantenimiento preventivo
-   - Estado de equipos
+### Generar Reportes
+1. Acceder al módulo de reportes
+2. Seleccionar tipo de reporte
 3. Definir período
-4. Exportar (PDF/Excel)
+4. Aplicar filtros
+5. Generar y descargar
 
-#### Gestión Documental
-1. Ir a "Documentos"
-2. Organizar por:
-   - Tipo de documento
-   - Equipo
-   - Fecha
-3. Subir/Descargar archivos
+## Solución de Problemas
 
-## 📱 Acceso Móvil
+### Problemas Comunes
+1. **No puedo iniciar sesión**
+   - Verificar mayúsculas/minúsculas
+   - Comprobar bloqueo de mayúsculas
+   - Contactar al administrador
 
-### Aplicación Responsive
-- Acceso desde cualquier dispositivo
-- Interfaz adaptativa
-- Funcionalidades principales disponibles
+2. **Error al subir archivos**
+   - Verificar tamaño máximo (10MB)
+   - Comprobar formato permitido
+   - Intentar con archivo más pequeño
 
-### Notificaciones
-- Push notifications
-- Alertas por email
-- Recordatorios SMS
+3. **Página no carga**
+   - Refrescar navegador
+   - Limpiar caché
+   - Verificar conexión
 
-## 🔐 Seguridad
-
-### Gestión de Contraseña
-1. Ir a "Mi Perfil"
-2. Seleccionar "Cambiar Contraseña"
-3. Seguir instrucciones
-
-### Sesiones Activas
-- Cierre automático por inactividad
-- Gestión de dispositivos conectados
-- Historial de accesos
-
-## 📞 Soporte
-
-### Ayuda en Línea
-- Chat de soporte
-- Base de conocimientos
-- Videos tutoriales
-
-### Contacto
+### Contacto de Soporte
 - Email: soporte@integralservice.cl
-- Teléfono: +56 9 XXXX XXXX
-- Horario: 24/7
+- Teléfono: [número de soporte]
+- Horario: Lunes a Viernes, 9:00 - 18:00
 
-## 🔄 Actualizaciones
-
-### Novedades
-- Registro de cambios
-- Nuevas funcionalidades
-- Mejoras del sistema
-
-### Capacitación
-- Webinars mensuales
-- Documentación actualizada
-- Sesiones personalizadas
+## Consejos de Uso
+- Cambiar contraseña regularmente
+- Cerrar sesión al terminar
+- Mantener información actualizada
+- Hacer respaldos periódicos
+- Reportar problemas inmediatamente

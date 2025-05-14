@@ -1,165 +1,220 @@
 # Catálogo de Servicios - Integral Service SPA
 
-## 1. Servicios de Refrigeración Industrial
+## Índice de Servicios
+1. [Automatización Industrial](#automatización-industrial)
+2. [Refrigeración Industrial](#refrigeración-industrial)
+3. [Electromecánica Industrial](#electromecánica-industrial)
+4. [Neumática](#neumática)
+5. [Hidráulica](#hidráulica)
 
-### 1.1 Mantenimiento Preventivo
-- **Periodicidad**: Trimestral/Semestral
-- **Alcance**:
-  - Inspección general del sistema
-  - Limpieza de condensadores
-  - Verificación de presiones
-  - Análisis de refrigerante
-  - Control de temperaturas
-- **Documentación**:
-  - Check-list de mantenimiento
-  - Reporte de parámetros
-  - Recomendaciones preventivas
+## Automatización Industrial
 
-### 1.2 Mantenimiento Correctivo
-- **Servicios**:
-  - Reparación de fugas
-  - Cambio de componentes
-  - Recarga de refrigerante
-  - Optimización del sistema
-- **Procedimientos Especiales**:
-  - Detección de fugas
-  - Recuperación de refrigerante
-  - Pruebas de vacío
-  - Puesta en marcha
+### Servicios Ofrecidos
 
-## 2. Servicios de Automatización
+1. **Programación de PLC**
+   - Siemens
+   - Schneider Electric
+   - Delta
+   - Tiempo estimado: 4-8 horas
+   - Nivel de urgencia: 1-5
 
-### 2.1 Programación y Control
-- **Sistemas**:
-  - PLCs
-  - HMIs
-  - SCADA
-  - Redes industriales
-- **Servicios**:
-  - Programación de equipos
-  - Configuración de redes
-  - Integración de sistemas
-  - Optimización de procesos
+2. **Sistemas SCADA**
+   - Diseño de interfaces HMI
+   - Integración con equipos existentes
+   - Configuración de comunicaciones
+   - Tiempo estimado: 8-16 horas
+   - Nivel de urgencia: 1-5
 
-### 2.2 Mantenimiento de Sistemas
-- **Alcance**:
-  - Backup de programas
-  - Actualización de firmware
-  - Calibración de instrumentos
-  - Verificación de comunicaciones
-- **Documentación**:
-  - Respaldos de programación
-  - Diagramas actualizados
-  - Parámetros de configuración
+3. **Control de Procesos**
+   - Sistemas de control distribuido
+   - Lazos de control PID
+   - Optimización de procesos
+   - Tiempo estimado: 6-12 horas
+   - Nivel de urgencia: 1-5
 
-## 3. Servicios Electromecánicos
+### Mantenimiento Preventivo
+- Revisión trimestral de sistemas
+- Actualización de firmware
+- Backup de programas
+- Calibración de instrumentos
 
-### 3.1 Diagnóstico y Reparación
-- **Equipos**:
-  - Motores eléctricos
-  - Bombas industriales
-  - Compresores
-  - Sistemas de transmisión
-- **Servicios**:
-  - Análisis de vibraciones
-  - Termografía
-  - Alineamiento láser
-  - Balanceo dinámico
+## Refrigeración Industrial
 
-### 3.2 Instalaciones
-- **Tipos**:
-  - Sistemas eléctricos
-  - Tableros de control
-  - Sistemas neumáticos
-  - Sistemas hidráulicos
-- **Alcance**:
-  - Diseño de sistemas
-  - Montaje de equipos
-  - Puesta en marcha
-  - Certificación
+### Servicios Principales
+1. **Sistemas de Refrigeración**
+   - Cámaras frigoríficas
+   - Túneles de congelación
+   - Secadores de aire
+   - Chillers industriales
+   - Centrales de climatizacion
+   - Tiempo estimado: 4-12 horas
+   - Nivel de urgencia: 1-5
 
-## 4. Servicios de Consultoría
+2. **Mantenimiento de Compresores**
+   - Compresores de tornillo
+   - Compresores reciprocantes
+   - Compresores centrífugos
+   - Tiempo estimado: 2-6 horas
+   - Nivel de urgencia: 1-5
 
-### 4.1 Asesoría Técnica
-- **Áreas**:
-  - Eficiencia energética
-  - Optimización de procesos
-  - Actualización tecnológica
-  - Normativas y regulaciones
-- **Entregables**:
-  - Informes técnicos
-  - Estudios de factibilidad
-  - Propuestas de mejora
-  - Análisis de costos
+3. **Control de Temperatura**
+   - Calibración de sensores
+   - Ajuste de controladores
+   - Optimización de ciclos
+   - Tiempo estimado: 2-4 horas
+   - Nivel de urgencia: 1-5
 
-### 4.2 Gestión de Proyectos
-- **Alcance**:
-  - Planificación
-  - Ejecución
-  - Control y seguimiento
-  - Cierre y documentación
-- **Metodología**:
-  - Definición de objetivos
-  - Cronograma de actividades
-  - Control de recursos
-  - Evaluación de resultados
+### Servicios de Emergencia
+- Disponibilidad 24/7
+- Tiempo de respuesta: 1-3 horas
+- Soporte telefónico inmediato
 
-## 5. Precios y Condiciones
+## Electromecánica Industrial
 
-### 5.1 Estructura de Precios
-- **Por Hora**:
-  - Servicio técnico: $XX.XXX
-  - Ingeniería: $XX.XXX
-  - Consultoría: $XX.XXX
-- **Por Proyecto**:
-  - Evaluación inicial
-  - Propuesta técnica
-  - Presupuesto detallado
-  - Cronograma de trabajo
+### Servicios Disponibles
+1. **Motores Eléctricos**
+   - Instalación
+   - Mantenimiento
+   - Rebobinado
+   - Tiempo estimado: 4-8 horas
+   - Nivel de urgencia: 1-5
 
-### 5.2 Contratos de Mantenimiento
-- **Básico**:
-  - 4 visitas anuales
-  - Tiempo de respuesta 48h
-  - Descuento en repuestos
-  - Informes trimestrales
-- **Premium**:
-  - 12 visitas anuales
-  - Tiempo de respuesta 24h
-  - Descuento mayor en repuestos
-  - Monitoreo continuo
-- **Personalizado**:
-  - Frecuencia según necesidad
-  - Tiempo de respuesta acordado
-  - Condiciones especiales
-  - Reportes personalizados
+2. **Tableros Eléctricos**
+   - Diseño
+   - Fabricación
+   - Mantenimiento
+   - Tiempo estimado: 6-12 horas
+   - Nivel de urgencia: 1-5
 
-## 6. Garantías y Seguros
+3. **Variadores de Frecuencia**
+   - Programación
+   - Instalación
+   - Mantenimiento
+   - Tiempo estimado: 2-4 horas
+   - Nivel de urgencia: 1-5
 
-### 6.1 Garantías
-- **Servicios**:
-  - 3 meses en mano de obra
-  - Según fabricante en repuestos
-  - Certificación de trabajos
-  - Respaldo técnico continuo
+## Neumática
 
-### 6.2 Seguros
-- **Coberturas**:
-  - Responsabilidad civil
-  - Daños a terceros
-  - Accidentes laborales
-  - Equipos y herramientas
+### Servicios Técnicos
 
-## 7. Niveles de Servicio
+1. **Sistemas Neumáticos**
 
-### 7.1 Tiempos de Respuesta
-- **Emergencia**: 2-4 horas
-- **Urgente**: 4-8 horas
-- **Normal**: 24-48 horas
-- **Programado**: Según acuerdo
+   - Diseño de circuitos
+   - Instalación de componentes
+   - Mantenimiento preventivo
+   - Tiempo estimado: 4-8 horas
+   - Nivel de urgencia: 1-5
 
-### 7.2 Indicadores de Calidad
-- Satisfacción del cliente
-- Tiempo de resolución
-- Efectividad de la solución
-- Cumplimiento de plazos
+2. **Compresores de Aire**
+
+   - Instalación
+   - Mantenimiento
+   - Reparación
+   - Tiempo estimado: 2-6 horas
+   - Nivel de urgencia: 1-5
+
+3. **Elementos Neumáticos**
+   - Válvulas
+   - Actuadores
+   - Unidades FRL
+   - Tiempo estimado: 1-3 horas
+   - Nivel de urgencia: 1-5
+
+### Diagnóstico y Optimización
+
+- Análisis de eficiencia
+- Detección de fugas
+- Optimización de consumo
+
+## Hidráulica
+
+### Servicios Especializados
+
+1. **Sistemas Hidráulicos**
+   - Diseño
+   - Instalación
+   - Mantenimiento
+   - Tiempo estimado: 6-12 horas
+   - Nivel de urgencia: 1-5
+
+3. **Válvulas y Actuadores**
+
+   - Calibración
+   - Reparación
+   - Sustitución
+   - Tiempo estimado: 2-4 horas
+   - Nivel de urgencia: 1-5
+
+## Niveles de Urgencia
+
+### Definición de Prioridades
+1. **Nivel 1 - Normal**
+   - Mantenimiento preventivo
+   - Mejoras planificadas
+   - Tiempo de respuesta: 48-72 horas
+
+2. **Nivel 2 - Importante**
+   - Anomalías menores
+   - Optimizaciones necesarias
+   - Tiempo de respuesta: 24-48 horas
+
+3. **Nivel 3 - Urgente**
+   - Fallos que afectan producción
+   - Problemas de seguridad menores
+   - Tiempo de respuesta: 12-24 horas
+
+4. **Nivel 4 - Muy Urgente**
+   - Parada parcial de producción
+   - Riesgos de seguridad moderados
+   - Tiempo de respuesta: 4-12 horas
+
+5. **Nivel 5 - Crítico**
+   - Parada total de producción
+   - Riesgos graves de seguridad
+   - Tiempo de respuesta: 1-4 horas
+
+## Contratos de Servicio
+
+### Tipos de Contrato
+
+1. **Sin Contrato**
+   - Servicios por demanda
+   - Tarifa estándar
+   - Sin prioridad especial
+   - Se prioriza a costo adicional
+
+2. **Contrato de monitoreo**   
+   - Monitoreo de equipos, o variables criticas
+   - dispositivo soporta maximo 10 variables
+   - Costo en uf por dispositivo de monitoreo
+   - Prioridad alta
+   - Soporte 24/7
+
+3. **Contrato Básico**
+   - Mantenimiento preventivo trimestral
+   - 10% descuento en servicios
+   - Prioridad normal
+
+4. **Contrato Premium**
+   - Mantenimiento preventivo mensual
+   - 20% descuento en servicios
+   - Prioridad alta
+   - Soporte 24/7
+
+5. **Contrato Personalizado**
+   - Servicios a medida
+   - Descuentos negociables
+   - Prioridad personalizada
+
+## Contacto y Soporte
+
+### Horario de Atención
+- Lunes a Viernes: 8:30 - 18:00
+- Sábados: 9:00 - 13:00
+- Emergencias: 24/7, solo con contrato.
+
+### Canales de Contacto
+- Teléfono: +56 9 6366 9300
+- Emergencias: +56 9 6366 9300
+- Email: contacto@integralservicespa.cl
+- Web: http://integralservicespa.cl
