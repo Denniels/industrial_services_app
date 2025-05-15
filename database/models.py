@@ -11,8 +11,37 @@ DATABASE_CONFIG = {
     'database': 'integral_service_db',
     'user': 'postgres',
     'password': 'DAms15820',
-    'port': '5432'
+    'port': '5432',
+    'client_encoding': 'utf8',
+    'options': '-c client_encoding=utf8'
 }
+
+def init_database():
+    """Inicializa la conexión a la base de datos y crea las tablas si no existen"""
+    try:
+        # Crear URL de conexión con parámetros de codificación
+        db_url = f"postgresql://{DATABASE_CONFIG['user']}:{DATABASE_CONFIG['password']}@{DATABASE_CONFIG['host']}:{DATABASE_CONFIG['port']}/{DATABASE_CONFIG['database']}"
+        
+        # Crear el motor de la base de datos con configuración UTF-8
+        engine = create_engine(
+            db_url, 
+            echo=False,
+            connect_args={
+                'client_encoding': 'utf8',
+                'options': '-c search_path=public -c client_encoding=utf8'
+            }
+        )
+        
+        # Crear todas las tablas definidas
+        Base.metadata.create_all(engine)
+        
+        # Crear y devolver la sesión
+        Session = sessionmaker(bind=engine)
+        return Session()
+        
+    except Exception as e:
+        print(f"Error al inicializar la base de datos: {str(e)}")
+        raise
 
 Base = declarative_base()
 
@@ -184,6 +213,7 @@ class ServiceRequest(Base):
     # Relaciones
     client = relationship('User', foreign_keys=[client_id], back_populates='client_requests')
     technician = relationship('User', foreign_keys=[assigned_technician_id], back_populates='assigned_services')
+    technical_report = relationship('TechnicalReport', back_populates='service_request', uselist=False)
 
 class TechnicalReport(Base):
     __tablename__ = 'technical_reports'
@@ -402,23 +432,3 @@ class MonitoredVariable(Base):
     
     # Relaciones
     device = relationship('MonitoringDevice', back_populates='variables')
-
-def init_database():
-    """Inicializa la conexión a la base de datos y crea las tablas si no existen"""
-    try:
-        # Crear URL de conexión
-        db_url = f"postgresql://{DATABASE_CONFIG['user']}:{DATABASE_CONFIG['password']}@{DATABASE_CONFIG['host']}:{DATABASE_CONFIG['port']}/{DATABASE_CONFIG['database']}"
-        
-        # Crear el motor de la base de datos
-        engine = create_engine(db_url, echo=False)
-        
-        # Crear todas las tablas definidas
-        Base.metadata.create_all(engine)
-        
-        # Crear y devolver la sesión
-        Session = sessionmaker(bind=engine)
-        return Session()
-        
-    except Exception as e:
-        print(f"Error al inicializar la base de datos: {str(e)}")
-        raise

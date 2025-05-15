@@ -2,23 +2,39 @@
 import streamlit as st
 import sys
 import os
+import locale
+import io
 
 # Configuración de codificación para Windows
 if sys.platform.startswith('win'):
-    import locale
     try:
+        # Intentar configurar la localización en español con UTF-8
         locale.setlocale(locale.LC_ALL, 'es-ES.UTF-8')
     except locale.Error:
         try:
+            # Intentar configurar la localización en español con codificación Windows
             locale.setlocale(locale.LC_ALL, 'Spanish_Spain.1252')
         except locale.Error:
+            # Si todo falla, usar la localización por defecto del sistema
             locale.setlocale(locale.LC_ALL, '')
     
     # Forzar UTF-8 en Windows
     os.environ['PYTHONIOENCODING'] = 'utf-8'
-    if sys.stdout.encoding != 'utf-8':
-        import codecs
-        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, errors='replace')
+    
+    # Configurar la codificación de entrada/salida estándar
+    if hasattr(sys, 'frozen'):
+        # Manejo especial para ejecutables compilados
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    else:
+        try:
+            # Para entornos de desarrollo
+            if hasattr(sys.stdout, 'buffer'):
+                sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+            if hasattr(sys.stderr, 'buffer'):
+                sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+        except Exception as e:
+            st.warning(f"Advertencia: No se pudo configurar la codificación UTF-8: {str(e)}")
 
 # Configuración de la página
 st.set_page_config(
@@ -38,9 +54,9 @@ from pages.client.service_request import client_dashboard
 def main():
     try:
         # Inicializar la base de datos
-        init_database()
+        session = init_database()
         
-        # Resto del código de la aplicación
+        # Configurar estado de la sesión
         if 'logged_in' not in st.session_state:
             st.session_state.logged_in = False
 
@@ -53,9 +69,9 @@ def main():
                 technician_dashboard()
             else:
                 client_dashboard()
-
+                
     except Exception as e:
-        st.error(f"Error al inicializar la base de datos: {str(e)}")
-
-if __name__ == '__main__':
+        st.error(f"Error en la aplicación: {str(e)}")
+        
+if __name__ == "__main__":
     main()
