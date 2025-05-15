@@ -97,6 +97,8 @@ class User(Base):
     updated_at = Column(DateTime, onupdate=datetime.utcnow)
     
     company = relationship('Company', back_populates='users')
+    devices = relationship('MonitoringDevice', back_populates='client', cascade='all, delete-orphan')
+    devices = relationship('MonitoringDevice', back_populates='client')
 
 class Equipment(Base):
     __tablename__ = 'equipment'
@@ -127,6 +129,49 @@ class ServiceRequest(Base):
     completion_date = Column(DateTime)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, onupdate=datetime.utcnow)
+
+class MonitoringDevice(Base):
+    __tablename__ = 'monitoring_devices'
+    
+    id = Column(Integer, primary_key=True)
+    client_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    device_serial = Column(String(50), unique=True, nullable=False)
+    device_type = Column(String(50))
+    variables_count = Column(Integer, default=0)
+    max_variables = Column(Integer, default=10)
+    is_active = Column(Boolean, default=True)
+    last_connection = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    client = relationship('User', back_populates='devices')
+    variables = relationship('MonitoredVariable', back_populates='device', cascade='all, delete-orphan')
+
+class MonitoredVariable(Base):
+    __tablename__ = 'monitored_variables'
+    
+    id = Column(Integer, primary_key=True)
+    device_id = Column(Integer, ForeignKey('monitoring_devices.id'), nullable=False)
+    name = Column(String(100), nullable=False)
+    description = Column(Text)
+    unit = Column(String(20))
+    min_value = Column(Float)
+    max_value = Column(Float)
+    alert_enabled = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    device = relationship('MonitoringDevice', back_populates='variables')
+    readings = relationship('VariableReading', back_populates='variable', cascade='all, delete-orphan')
+
+class VariableReading(Base):
+    __tablename__ = 'variable_readings'
+    
+    id = Column(Integer, primary_key=True)
+    variable_id = Column(Integer, ForeignKey('monitored_variables.id'), nullable=False)
+    value = Column(Float, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    quality = Column(Integer)  # Calidad de la lectura (0-100)
+    
+    variable = relationship('MonitoredVariable', back_populates='readings')
 
 # Configuración de las relaciones bidireccionales después de definir todas las clases
 User.submitted_requests = relationship('ServiceRequest', 

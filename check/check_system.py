@@ -3,6 +3,12 @@ import importlib
 import pkg_resources
 import sys
 import subprocess
+import os
+
+# Añadir el directorio raíz al path
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 def check_python_version():
     """Verificar la versión de Python"""
@@ -25,13 +31,14 @@ def check_package(package_name):
 def check_dependencies():
     """Verificar todas las dependencias requeridas"""
     required_packages = [
-        'streamlit',
         'sqlalchemy',
+        'flask',
+        'flask-login',
+        'flask-sqlalchemy',
+        'flask-jwt-extended',
         'psycopg2-binary',
         'python-dotenv',
-        'click',
         'bcrypt',
-        'python-jose',
         'alembic'
     ]
     
@@ -76,19 +83,20 @@ def main():
         print("\nAlgunas dependencias no están instaladas.")
         response = input("¿Desea instalar las dependencias faltantes? (s/n): ")
         if response.lower() == 's':
-            subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+            setup_path = os.path.join(parent_dir, 'setup', 'setup.py')
+            subprocess.run([sys.executable, setup_path, "install"])
         else:
             sys.exit(1)
     
     print("\n=== Verificando Base de Datos ===")
     if not check_postgresql():
         print("\nLa base de datos necesita configuración.")
-        print("Por favor, ejecute: python setup.py")
+        print("Por favor, ejecute: python setup/setup.py setup-db")
         sys.exit(1)
     
     print("\n=== Todo está correctamente configurado ===")
     print("\nPuede ejecutar la aplicación con:")
-    print("streamlit run main.py")
+    print("python main.py")
 
 if __name__ == "__main__":
     main()
