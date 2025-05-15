@@ -42,7 +42,7 @@ def initialize_data():
                 city="Temuco",
                 region="La Araucania",
                 phone="+56 9 6366 9300",
-                email="contacto@integralservice.cl",
+                email="contacto@integralservicespa.cl",
                 is_internal=True,
                 created_at=datetime.utcnow()
             )
@@ -63,7 +63,7 @@ def initialize_data():
             admin_user = User(
                 company_id=company.id,
                 username="admin",
-                email="admin@integralservice.cl",
+                email="contacto@integralservicespa.cl",
                 password=password_hash,
                 role=UserRole.ADMIN,
                 first_name="Administrador",

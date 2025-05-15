@@ -1,21 +1,24 @@
-# -*- coding: ascii -*-
+# -*- coding: utf-8 -*-
 import os
 import sys
 import psycopg2
 import logging
 from pathlib import Path
+from database.models import DATABASE_CONFIG, User
+from sqlalchemy import create_engine, text
+import bcrypt
+import base64
 
-# Configurar logging básico
+# Configurar logging
 log_dir = Path('logs')
 log_dir.mkdir(exist_ok=True)
-log_file = log_dir / 'database_diagnostic.log'
+log_file = log_dir / 'diagnostic.log'
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout)
-    ]
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    filename=log_file,
+    encoding='utf-8'
 )
 logger = logging.getLogger(__name__)
 
@@ -35,84 +38,104 @@ def check_environment():
 
 def check_database_connection():
     """Verificar conexión a la base de datos"""
-    logger.info("\n=== Verificacion de Base de Datos ===")
-    
     try:
-        # Intentar conexión a postgres primero
+        # Conexión directa con psycopg2
         conn = psycopg2.connect(
-            dbname='postgres',
-            user='postgres',
-            password='admin',
-            host='localhost',
-            port='5432'
+            host=DATABASE_CONFIG['host'],
+            database=DATABASE_CONFIG['database'],
+            user=DATABASE_CONFIG['user'],
+            password=DATABASE_CONFIG['password']
         )
         
-        with conn.cursor() as cur:
-            # Verificar versión
-            cur.execute('SELECT version();')
-            version = cur.fetchone()[0]
-            logger.info(f"Version PostgreSQL: {version}")
-            
-            # Listar bases de datos
-            cur.execute("""
-                SELECT datname, encoding::int, 
-                pg_encoding_to_char(encoding) as encoding_name
-                FROM pg_database
-                WHERE datistemplate = false;
-            """)
-            databases = cur.fetchall()
-            logger.info("\nBases de datos:")
-            for db in databases:
-                logger.info(f"  - {db[0]} (encoding: {db[2]})")
+        cur = conn.cursor()
         
+        # Verificar codificación
+        cur.execute("SHOW server_encoding")
+        server_encoding = cur.fetchone()[0]
+        logger.info(f"Codificación del servidor: {server_encoding}")
+        
+        cur.execute("SHOW client_encoding")
+        client_encoding = cur.fetchone()[0]
+        logger.info(f"Codificación del cliente: {client_encoding}")
+        
+        # Verificar configuración de locale
+        cur.execute("SHOW lc_collate")
+        lc_collate = cur.fetchone()[0]
+        logger.info(f"LC_COLLATE: {lc_collate}")
+        
+        cur.close()
         conn.close()
-        
-        # Intentar conexión a integral_service_db
-        conn = psycopg2.connect(
-            dbname='integral_service_db',
-            user='postgres',
-            password='admin',
-            host='localhost',
-            port='5432'
-        )
-        
-        with conn.cursor() as cur:
-            # Verificar tablas
-            cur.execute("""
-                SELECT table_name, pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) as size
-                FROM information_schema.tables
-                WHERE table_schema = 'public'
-                ORDER BY pg_total_relation_size(quote_ident(table_name)) DESC;
-            """)
-            tables = cur.fetchall()
-            logger.info("\nTablas en integral_service_db:")
-            for table in tables:
-                logger.info(f"  - {table[0]} (tamano: {table[1]})")
-            
-            # Verificar configuración
-            cur.execute("SHOW ALL;")
-            settings = cur.fetchall()
-            logger.info("\nConfiguracion relevante:")
-            important_settings = ['client_encoding', 'server_encoding', 'timezone']
-            for setting in settings:
-                if setting[0] in important_settings:
-                    logger.info(f"  - {setting[0]}: {setting[1]}")
-        
-        logger.info("\n✅ Verificacion completada exitosamente")
+        logger.info("✅ Conexión a base de datos verificada")
         return True
-        
     except Exception as e:
-        logger.error(f"\n❌ Error durante la verificacion: {str(e)}")
+        logger.error(f"Error de conexión: {str(e)}")
         return False
-    finally:
-        if 'conn' in locals():
-            conn.close()
 
-if __name__ == '__main__':
+def verify_admin_user():
+    """Verificar usuario administrador"""
     try:
-        check_environment()
-        check_database_connection()
+        # Crear conexión SQLAlchemy
+        db_url = f"postgresql://{DATABASE_CONFIG['user']}:{DATABASE_CONFIG['password']}@{DATABASE_CONFIG['host']}:{DATABASE_CONFIG['port']}/{DATABASE_CONFIG['database']}"
+        engine = create_engine(db_url)
+        
+        # Verificar usuario admin
+        with engine.connect() as conn:
+            result = conn.execute(text("SELECT * FROM users WHERE username = 'admin'"))
+            admin = result.fetchone()
+            
+            if admin:
+                logger.info(f"Usuario admin encontrado (ID: {admin.id})")
+                logger.info(f"Email: {admin.email}")
+                logger.info(f"Activo: {admin.is_active}")
+                
+                # Verificar hash de contraseña
+                try:
+                    password = "12345678"
+                    stored_hash = admin.password
+                    
+                    # Decodificar hash
+                    hash_bytes = base64.b64decode(stored_hash)
+                    
+                    # Verificar contraseña
+                    password_bytes = password.encode('utf-8')
+                    if bcrypt.checkpw(password_bytes, hash_bytes):
+                        logger.info("✅ Hash de contraseña verificado correctamente")
+                    else:
+                        logger.error("❌ La contraseña no coincide con el hash")
+                        
+                except Exception as e:
+                    logger.error(f"Error verificando hash: {str(e)}")
+            else:
+                logger.error("❌ Usuario admin no encontrado")
+                
+        return True
     except Exception as e:
-        logger.error(f"Error general: {str(e)}")
-    finally:
-        logger.info("\nRevisa el archivo logs/database_diagnostic.log para mas detalles")
+        logger.error(f"Error verificando usuario admin: {str(e)}")
+        return False
+
+def run_diagnostics():
+    """Ejecutar diagnóstico completo"""
+    print("🔍 Iniciando diagnóstico...")
+    
+    # Verificar entorno
+    print("\nVerificando entorno...")
+    check_environment()
+    
+    # Verificar base de datos
+    print("\nVerificando conexión a base de datos...")
+    if check_database_connection():
+        print("✅ Conexión a base de datos correcta")
+    else:
+        print("❌ Error en conexión a base de datos")
+    
+    # Verificar usuario admin
+    print("\nVerificando usuario administrador...")
+    if verify_admin_user():
+        print("✅ Usuario admin verificado")
+    else:
+        print("❌ Error verificando usuario admin")
+    
+    print("\n📋 Diagnóstico completado. Revise logs/diagnostic.log para más detalles.")
+
+if __name__ == "__main__":
+    run_diagnostics()

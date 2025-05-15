@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import create_engine, event
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.pool import QueuePool
 from dotenv import load_dotenv
 import os
 import logging
 import sys
+from contextlib import contextmanager
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -28,74 +29,63 @@ DATABASE_CONFIG = {
     'user': os.getenv('DB_USER', 'postgres'),
     'password': os.getenv('DB_PASSWORD', 'DAms15820'),
     'port': os.getenv('DB_PORT', '5432'),
-    'options': '-c client_encoding=utf8'
+    'options': '-c client_encoding=utf8 -c standard_conforming_strings=on',
+    'client_encoding': 'utf8'
 }
 
-# Configuración de la base de datos
-DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:admin@localhost:5432/integral_service_db')
+def get_database_url():
+    """Obtener URL de conexión a la base de datos con la configuración correcta"""
+    return f"postgresql://{DATABASE_CONFIG['user']}:{DATABASE_CONFIG['password']}@" \
+           f"{DATABASE_CONFIG['host']}:{DATABASE_CONFIG['port']}/{DATABASE_CONFIG['database']}" \
+           f"?client_encoding=utf8"
 
-# Opciones específicas de PostgreSQL
-POSTGRES_OPTIONS = {
-    'pool_size': 20,
-    'max_overflow': 10,
-    'pool_timeout': 30,
-    'pool_recycle': 1800,
-    'pool_pre_ping': True,
-    'echo': True,
-    'isolation_level': 'READ COMMITTED',
-    'connect_args': {
-        'client_encoding': 'utf8',
-        'application_name': 'integral_service_app',
-        'options': '-c search_path=public -c client_encoding=utf8 -c timezone=UTC'
-    }
-}
+# Crear el motor de base de datos con la configuración correcta
+engine = create_engine(
+    get_database_url(),
+    pool_size=5,
+    max_overflow=10,
+    echo=False,
+    poolclass=QueuePool,
+    connect_args={'options': DATABASE_CONFIG['options']}
+)
 
-# Crear el motor de SQLAlchemy con opciones optimizadas
-try:
-    engine = create_engine(
-        DATABASE_URL,
-        poolclass=QueuePool,
-        **POSTGRES_OPTIONS
-    )
-    logger.info("Motor de base de datos creado exitosamente")
-except Exception as e:
-    logger.error(f"Error al crear el motor de base de datos: {str(e)}")
-    raise
+# Configurar eventos de conexión
+@event.listens_for(engine, 'connect')
+def configure_connection(dbapi_connection, connection_record):
+    """Configurar la conexión cuando se establece"""
+    cursor = dbapi_connection.cursor()
+    cursor.execute("SET client_encoding TO 'utf8';")
+    cursor.execute("SET standard_conforming_strings TO on;")
+    cursor.close()
 
-# Crear clase de sesión
+# Crear fábrica de sesiones
 SessionLocal = sessionmaker(
+    bind=engine,
     autocommit=False,
     autoflush=False,
-    bind=engine,
     expire_on_commit=False
 )
 
-# Función para obtener la base de datos con manejo de errores
-def get_db():
-    db = SessionLocal()
+# Crear sesión con scope
+ScopedSession = scoped_session(SessionLocal)
+
+def get_session():
+    """Obtener una nueva sesión de base de datos"""
+    session = ScopedSession()
     try:
-        yield db
-        logger.debug("Sesión de base de datos creada")
+        return session
     except Exception as e:
-        logger.error(f"Error en la sesión de base de datos: {str(e)}")
-        db.rollback()
+        logger.error(f"Error al crear sesión: {str(e)}")
+        session.close()
         raise
+
+def get_db():
+    """Generator para obtener una sesión de base de datos"""
+    session = ScopedSession()
+    try:
+        yield session
     finally:
-        db.close()
-        logger.debug("Sesión de base de datos cerrada")
+        session.close()
 
-# Event listeners para debugging y monitoreo
-@event.listens_for(engine, 'connect')
-def receive_connect(dbapi_connection, connection_record):
-    logger.info("Nueva conexión establecida a la base de datos")
-
-@event.listens_for(engine, 'checkout')
-def receive_checkout(dbapi_connection, connection_record, connection_proxy):
-    logger.debug("Conexión retirada del pool")
-
-@event.listens_for(engine, 'checkin')
-def receive_checkin(dbapi_connection, connection_record):
-    logger.debug("Conexión devuelta al pool")
-
-# Base declarativa para los modelos
+# Base para modelos declarativos
 Base = declarative_base()

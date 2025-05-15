@@ -4,74 +4,113 @@ import sys
 import os
 import locale
 import io
+import warnings
+from auth.login import login_page
+from pages.admin.dashboard import admin_dashboard
+from pages.client.monitoring import show_monitoring_dashboard
+from pages.technician.dashboard import technician_dashboard
+from pages.supervisor.dashboard import supervisor_dashboard
+from database.models import init_database
+
+# Suprimir advertencias específicas de codificación
+warnings.filterwarnings('ignore', category=RuntimeWarning, module='streamlit')
 
 # Configuración de codificación para Windows
 if sys.platform.startswith('win'):
     try:
-        # Intentar configurar la localización en español con UTF-8
         locale.setlocale(locale.LC_ALL, 'es-ES.UTF-8')
     except locale.Error:
         try:
-            # Intentar configurar la localización en español con codificación Windows
             locale.setlocale(locale.LC_ALL, 'Spanish_Spain.1252')
         except locale.Error:
-            # Si todo falla, usar la localización por defecto del sistema
             locale.setlocale(locale.LC_ALL, '')
     
-    # Forzar UTF-8 en Windows
     os.environ['PYTHONIOENCODING'] = 'utf-8'
-    
-    # Configurar la codificación de entrada/salida estándar
-    if hasattr(sys, 'frozen'):
-        # Manejo especial para ejecutables compilados
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
-    else:
-        try:
-            # Para entornos de desarrollo
-            if hasattr(sys.stdout, 'buffer'):
-                sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-            if hasattr(sys.stderr, 'buffer'):
-                sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
-        except Exception as e:
-            st.warning(f"Advertencia: No se pudo configurar la codificación UTF-8: {str(e)}")
+    os.environ['LANG'] = 'es_ES.UTF-8'
 
 # Configuración de la página
 st.set_page_config(
-    page_title="Sistema de Gestión - Integral Service",
-    page_icon="🔧",
+    page_title="Sistema de Servicios Industriales",
+    page_icon="🏭",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
+    menu_items={
+        'About': "Sistema de Servicios Industriales - Versión 1.0",
+        'Report a bug': "https://github.com/tu-repo/issues",
+        'Get help': "https://docs.tu-sistema.com"
+    }
 )
 
-# Importaciones del proyecto
-from auth.login import login_page
-from database.models import init_database
-from pages.admin.dashboard import admin_dashboard
-from pages.technician.dashboard import technician_dashboard
-from pages.client.service_request import client_dashboard
+# Inicializar la base de datos
+try:
+    init_database()
+except Exception as e:
+    st.error(f"Error al inicializar la base de datos: {str(e)}")
+    st.stop()
 
-def main():
+# Inicializar estado de la sesión
+if 'current_page' not in st.session_state:
+    st.session_state.current_page = 'login'
+
+# Manejo de cerrar sesión en el sidebar
+if st.sidebar.button('Cerrar Sesión') and 'authenticated' in st.session_state:
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    st.rerun()
+
+# Enrutamiento basado en el estado de la sesión
+if not st.session_state.get('authenticated', False):
+    login_page()
+else:
+    # Mostrar información del usuario
+    st.sidebar.info(f"Usuario: {st.session_state.user['username']}")
+    
+    # Menú de navegación según el rol
+    if st.session_state.user['role'] == 'ADMIN':
+        pages = {
+            'Panel de Control': 'admin_dashboard',
+            'Gestión de Usuarios': 'user_management',
+            'Gestión de Servicios': 'service_management',
+            'Reportes': 'reports',
+            'Configuración': 'settings'
+        }
+    elif st.session_state.user['role'] == 'SUPERVISOR':
+        pages = {
+            'Panel de Supervisor': 'supervisor_dashboard',
+            'Gestión de Servicios': 'service_management',
+            'Reportes': 'reports'
+        }
+    elif st.session_state.user['role'] == 'TECHNICIAN':
+        pages = {
+            'Mis Servicios': 'technician_dashboard',
+            'Reportes Técnicos': 'technical_reports'
+        }
+    else:  # CLIENT
+        pages = {
+            'Monitor de Variables': 'monitoring_dashboard',
+            'Solicitudes de Servicio': 'service_requests',
+            'Historial': 'service_history'
+        }
+    
+    # Selector de página en el sidebar
+    if len(pages) > 1:  # Solo mostrar selector si hay más de una página
+        selected_page = st.sidebar.selectbox('Navegación', list(pages.keys()))
+        st.session_state.current_page = pages[selected_page]
+    
+    # Enrutamiento a la página correspondiente
     try:
-        # Inicializar la base de datos
-        session = init_database()
-        
-        # Configurar estado de la sesión
-        if 'logged_in' not in st.session_state:
-            st.session_state.logged_in = False
-
-        if not st.session_state.logged_in:
-            login_page()
-        else:
-            if st.session_state.user_role == 'admin':
-                admin_dashboard()
-            elif st.session_state.user_role == 'technician':
-                technician_dashboard()
-            else:
-                client_dashboard()
-                
+        if st.session_state.current_page == 'admin_dashboard':
+            admin_dashboard()
+        elif st.session_state.current_page == 'supervisor_dashboard':
+            supervisor_dashboard()
+        elif st.session_state.current_page == 'technician_dashboard':
+            technician_dashboard()
+        elif st.session_state.current_page == 'monitoring_dashboard':
+            show_monitoring_dashboard()
+        elif st.session_state.current_page == 'service_requests':
+            from pages.client.service_request import show_service_requests
+            show_service_requests()
+        # ... más páginas según sea necesario
     except Exception as e:
-        st.error(f"Error en la aplicación: {str(e)}")
-        
-if __name__ == "__main__":
-    main()
+        st.error(f"Error al cargar la página: {str(e)}")
+        st.error("Por favor, intente recargar la página o contacte al administrador.")
